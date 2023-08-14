@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitdumb</title>
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
+    <script defer src="main.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>Split dumb</h1>
+        <h2>Participants</h2>
+        <ul>
+            <li v-for="participant in participants" :key="participant.name">
+                {{ participant.name }}: <input v-model="participant.payed" type="number">
+            </li>
+        </ul>
+        <p>Total: {{ total }}€</p>
+        <h2>Payments</h2>
+        <ul>
+            <li v-for="payment in payments" :key="payment.payer + payment.receiver">
+                {{ payment.payer }} pays {{ payment.amount.toFixed(2) }}€ to {{ payment.receiver }}
+            </li>
+        </ul>
+    </div>
+</body>
+</html>
