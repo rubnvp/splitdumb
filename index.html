@@ -10,14 +10,20 @@
 <body>
     <div id="app">
         <h1>Split dumb</h1>
-        <h2>Participants</h2>
+        <h2>
+            Participants
+            <button @click="addParticipant">+</button>
+        </h2>
         <ul>
             <li v-for="participant in participants" :key="participant.name">
-                {{ participant.name }}: <input v-model="participant.payed" type="number">
+                {{ participant.name }}:
+                <input v-model="participant.payed" type="number">
+                <button @click="removeParticipant(participant)">x</button>
             </li>
         </ul>
-        <p>Total: {{ total }}€</p>
-        <h2>Payments</h2>
+        <p>Total: <b>{{ total }}€</b> ({{ ((total / participants.length) || 0).toFixed(2) }}€ per person)</p>
+        <h2 v-if="payments.length">Payments</h2>
+        <p v-else>No payments needed 👍</p>
         <ul>
             <li v-for="payment in payments" :key="payment.payer + payment.receiver">
                 {{ payment.payer }} pays {{ payment.amount.toFixed(2) }}€ to {{ payment.receiver }}
