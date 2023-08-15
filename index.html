@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splitdumb</title>
-    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
-    <script defer src="main.js"></script>
+    <style>[v-cloak] { display: none }</style>
 </head>
 <body>
-    <div id="app">
-        <h1>Split dumb</h1>
+    <div id="app" v-cloak>
+        <h1 style="display: inline-block;">Splitdumb - {{ room }}</h1> <button @click="shareRoom">Share</button>
         <h2>
             Participants
             <button @click="addParticipant">+</button>
@@ -30,5 +29,8 @@
             </li>
         </ul>
     </div>
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.js"></script>
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>

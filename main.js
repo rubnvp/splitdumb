@@ -1,16 +1,30 @@
-const { createApp, ref, computed, watchEffect } = Vue;
+const { createApp, ref, computed, watch, watchEffect, onMounted } = Vue;
+import { subscribeToRoom, updateParticipants } from "./firebase.js";
 
 createApp({
   setup: () => {
-    const urlParticipants = decodeURI(location.hash).slice(1);
-    const participants = ref(urlParticipants ? JSON.parse(urlParticipants) : []);
-    watchEffect(() => {
-      const hash = participants.value.length
-        ? JSON.stringify(participants.value)
-        : '';
-      location.hash = hash;
-    });
+    // Room logic
+    let room = decodeURI(location.hash).slice(1);
+    if (!room) {
+      while (!room) {
+        room = prompt('Go to room');
+      }
+      location.hash = room;
+    }
+    async function shareRoom() {
+      if (!navigator.canShare) {
+        await navigator.clipboard.writeText(location.href);
+        return alert('Room link copied to clipboard');
+      }
+      await navigator.share({
+        title: 'Splitdumb',
+        text: `Join my room ${room}`,
+        url: location.href,
+      });
+    }
 
+    // Participants
+    const participants = ref([]);
     function addParticipant() {
       const name = prompt('Participant name');
       if (participants.value.some(participant => participant.name === name)) {
@@ -23,11 +37,19 @@ createApp({
       participants.value.splice(participants.value.indexOf(participant), 1);
     }
 
-
+    // Firebase integration
+    subscribeToRoom(room, (participantsDb) => {
+      if (JSON.stringify(participants.value) === JSON.stringify(participantsDb)) return;
+      participants.value = participantsDb;
+    });
+    watch(participants, async () => {
+      await updateParticipants(room, participants.value);
+    }, { deep: true });
+    
+    // Payments calculation
     const total = computed(() => {
       return participants.value.reduce((acc, participant) =>  acc + participant.payed, 0);
     });
-
     const payments = computed(() => {
       const average = total.value / participants.value.length;
       const payers = [];
@@ -60,6 +82,8 @@ createApp({
     });
 
     return {
+      room,
+      shareRoom,
       participants,
       addParticipant,
       removeParticipant,
